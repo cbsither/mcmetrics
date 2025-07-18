@@ -338,122 +338,178 @@ class MCMetrics:
 
         return metric_dict
     
-    def calc_mode(self, metric: str, axis: int = 0) -> np.ndarray:
+    def calc_mode(self, metric: str = None, axis: int = 0) -> np.ndarray:
         """
         Estimate the mode of a (unimodal) sample via the half-sample-mode algorithm.
         Returns an array of modes along the specified axis.
         """
-        # Access the metric data
-        data = self.metrics[self.metric_metadata[metric]['data array']]
+        if metric is None:
+            if not hasattr(self, '_metric'):
+                raise ValueError("No metric specified. Please specify a metric to calculate the mean.")
+            metric = self._metric
 
-        def hsm_recursive(arr):
-            n = len(arr)
-            # Base case: if 1 or 2 points remain, return their midpoint
-            if n <= 2:
-                return 0.5 * (arr[0] + arr[-1])
-            # Number of points in the half
-            half = (n + 1) // 2  # ceiling of n/2
-            # Find sub-interval of length 'half' that has the smallest range
-            min_width = np.inf
-            min_idx = 0
-            for i in range(n - half + 1):
-                width = arr[i + half - 1] - arr[i]
-                if width < min_width:
-                    min_width = width
-                    min_idx = i
-            # Restrict to that smallest sub-interval
-            new_arr = arr[min_idx : min_idx + half]
-            return hsm_recursive(new_arr)
+        if len(metric[0]) == 1:
 
-        # Apply the half-sample-mode algorithm along the specified axis
-        if axis == 0:
-            temp_metrics = np.apply_along_axis(lambda x: hsm_recursive(np.sort(x)), axis, data)
-            # add class labels to the dictionary
-            metric_dict = {self.class_names[i]: temp_metrics[i] for i in range(len(temp_metrics))}
-            return metric_dict
-        elif axis == 1:
-            temp_metrics = np.apply_along_axis(lambda x: hsm_recursive(np.sort(x)), axis, data)
-            # add class labels to the dictionary
-            metric_dict = {f'row_{i}': temp_metrics[i] for i in range(len(temp_metrics))}
-            return metric_dict
+            # Access the metric data
+            data = self.metrics[self.metric_metadata[metric[0]]['data array']]
+
+            def hsm_recursive(arr):
+                n = len(arr)
+                # Base case: if 1 or 2 points remain, return their midpoint
+                if n <= 2:
+                    return 0.5 * (arr[0] + arr[-1])
+                # Number of points in the half
+                half = (n + 1) // 2  # ceiling of n/2
+                # Find sub-interval of length 'half' that has the smallest range
+                min_width = np.inf
+                min_idx = 0
+                for i in range(n - half + 1):
+                    width = arr[i + half - 1] - arr[i]
+                    if width < min_width:
+                        min_width = width
+                        min_idx = i
+                # Restrict to that smallest sub-interval
+                new_arr = arr[min_idx : min_idx + half]
+                return hsm_recursive(new_arr)
+
+            # Apply the half-sample-mode algorithm along the specified axis
+            if axis == 0:
+                temp_metrics = np.apply_along_axis(lambda x: hsm_recursive(np.sort(x)), axis, data)
+                # add class labels to the dictionary
+                metric_dict = {self.class_names[i]: temp_metrics[i] for i in range(len(temp_metrics))}
+                return metric_dict
+            elif axis == 1:
+                temp_metrics = np.apply_along_axis(lambda x: hsm_recursive(np.sort(x)), axis, data)
+                # add class labels to the dictionary
+                metric_dict = {f'row_{i}': temp_metrics[i] for i in range(len(temp_metrics))}
+                return metric_dict
+            else:
+                raise ValueError("Axis must be 0 or 1")
+            
         else:
-            raise ValueError("Axis must be 0 or 1")
+            raise ValueError("Mode calculation is only supported for a single metric at a time. Please specify a single metric.")
 
 
-    def fit_beta(self, metric):
+    def fit_beta(self, metric=None):
         """
         Fits a Beta distribution to the posterior samples for a metric.
 
         Returns:
         """
-        mu_est = self.calc_mean(metric)
-        var_est = self.calc_var(metric, ddof=0)
+        if metric is None:
+            if not hasattr(self, '_metric'):
+                raise ValueError("No metric specified. Please specify a metric to calculate the mean.")
+            metric = self._metric
 
-        alpha_hat = {}
-        beta_hat = {}
+        if len(metric) == 1:
 
-        for key in mu_est:
-            
+            mu_est = self.calc_mean(metric)
+            var_est = self.calc_var(metric, ddof=0)
 
-            conc_param = mu_est[key]*(1-mu_est[key])/var_est[key] - 1
-            prop_alpha_hat = mu_est[key] * conc_param
-            prop_beta_hat  = (1-mu_est[key]) * conc_param
+            alpha_hat = {}
+            beta_hat = {}
 
-            alpha_hat[key] = prop_alpha_hat
-            beta_hat[key] = prop_beta_hat
+            for key in mu_est:
+                
 
-        # reorganize the dictionaries to match class names
+                conc_param = mu_est[key]*(1-mu_est[key])/var_est[key] - 1
+                prop_alpha_hat = mu_est[key] * conc_param
+                prop_beta_hat  = (1-mu_est[key]) * conc_param
 
-        class_hat = {}
+                alpha_hat[key] = prop_alpha_hat
+                beta_hat[key] = prop_beta_hat
 
-        for i in range(len(self.class_names)):
-            class_hat[self.class_names[i]] = {
-                'alpha': alpha_hat.get(self.class_names[i], 0),
-                'beta': beta_hat.get(self.class_names[i], 0)
-            }
+            # reorganize the dictionaries to match class names
 
-        return class_hat
+            class_hat = {}
+
+            for i in range(len(self.class_names)):
+                class_hat[self.class_names[i]] = {
+                    'alpha': alpha_hat.get(self.class_names[i], 0),
+                    'beta': beta_hat.get(self.class_names[i], 0)
+                }
+
+            return class_hat
+        else:
+            raise ValueError("Beta fitting is only supported for a single metric at a time. Please specify a single metric.")
 
 
-    def calc_mean(self, metric, calc_ci=True, ci=0.95, cil=None, ciu=None):
+    def calc_mean(self, metric=None, calc_ci=True, ci=0.95, cil=None, ciu=None):
         """
         Calculate the mean of a metric.
         """
-        temp_metrics = self.metrics[self.metric_metadata[metric]['data array']].mean(axis=0)
-        # add class labels to the dictionary
-        metric_dict = {self.class_names[i]: temp_metrics[i] for i in range(len(temp_metrics))}
-        return metric_dict
+
+        if metric is None:
+            if not hasattr(self, '_metric'):
+                raise ValueError("No metric specified. Please specify a metric to calculate the mean.")
+            metric = self._metric
+
+        if len(metric) == 1:
+            temp_metrics = self.metrics[self.metric_metadata[metric[0]]['data array']].mean(axis=0)
+            # add class labels to the dictionary
+            metric_dict = {self.class_names[i]: temp_metrics[i] for i in range(len(temp_metrics))}
+            return metric_dict
+        
+        else:
+            raise ValueError("Mean calculation is only supported for a single metric at a time. Please specify a single metric.")
     
 
-    def calc_var(self, metric, ddof=1):
+    def calc_var(self, metric=None, ddof=1):
         """
         Calculate the variance of a metric.
         """
-        temp_metrics = self.metrics[self.metric_metadata[metric]['data array']].var(ddof=ddof, axis=0)
-        # add class labels to the dictionary
-        metric_dict = {self.class_names[i]: temp_metrics[i] for i in range(len(temp_metrics))}
-        return metric_dict
+        if metric is None:
+            if not hasattr(self, '_metric'):
+                raise ValueError("No metric specified. Please specify a metric to calculate the mean.")
+            metric = self._metric
+
+        if len(metric) == 1:
+            temp_metrics = self.metrics[self.metric_metadata[metric[0]]['data array']].var(ddof=ddof, axis=0)
+            # add class labels to the dictionary
+            metric_dict = {self.class_names[i]: temp_metrics[i] for i in range(len(temp_metrics))}
+
+            return metric_dict
+    
+        else:
+            raise ValueError("Variance calculation is only supported for a single metric at a time. Please specify a single metric.")
     
 
-    def calc_std(self, metric, ddof=1):
+    def calc_std(self, metric: str = None, ddof: int = 1):
         """
         Calculate the standard deviation of a metric.
         """
-        temp_metrics = self.metrics[self.metric_metadata[metric]['data array']].std(ddof=ddof, axis=0)
-        # add class labels to the dictionary
-        metric_dict = {self.class_names[i]: temp_metrics[i] for i in range(len(temp_metrics))}
-        return metric_dict
+        if metric is None:
+            if not hasattr(self, '_metric'):
+                raise ValueError("No metric specified. Please specify a metric to calculate the mean.")
+            metric = self._metric
+
+        if len(metric) == 1:
+            temp_metrics = self.metrics[self.metric_metadata[metric[0]]['data array']].std(ddof=ddof, axis=0)
+            # add class labels to the dictionary
+            metric_dict = {self.class_names[i]: temp_metrics[i] for i in range(len(temp_metrics))}
+            return metric_dict
+        
+        else:
+            raise ValueError("Standard deviation calculation is only supported for a single metric at a time. Please specify a single metric.")
 
 
-    def calc_median(self, metric):
+    def calc_median(self, metric: str = None):
         """
         Calculate the median of a metric.
         """
-        # calculate a temporary array for row medians
-        temp_metrics = self.metrics[self.metric_metadata[metric]['data array']].median(axis=0)
-        # add class labels to the dictionary
-        metric_dict = {self.class_names[i]: temp_metrics[i] for i in range(len(temp_metrics))}
-        return metric_dict
+        if metric is None:
+            if not hasattr(self, '_metric'):
+                raise ValueError("No metric specified. Please specify a metric to calculate the mean.")
+            metric = self._metric
+
+        if len(metric) == 1:
+            # calculate a temporary array for row medians
+            temp_metrics = self.metrics[self.metric_metadata[metric[0]]['data array']].median(axis=0)
+            # add class labels to the dictionary
+            metric_dict = {self.class_names[i]: temp_metrics[i] for i in range(len(temp_metrics))}
+            return metric_dict
+        else:
+            raise ValueError("Median calculation is only supported for a single metric at a time. Please specify a single metric.")
 
 
     def retrieve_metric_samples(self, metric):
@@ -461,6 +517,7 @@ class MCMetrics:
         Retrieve a metric from the metrics dictionary.
         """
         return self.metrics[self.metric_metadata[metric]['data array']]
+
 
     """ Posterior Distributions """
 
@@ -481,7 +538,8 @@ class MCMetrics:
         for m in metric:
             if m not in self.metric_metadata:
                 raise ValueError(f"Metric '{m}' is not defined in metric_metadata.")
-
+        
+        self._metric = metric
         
         for m in metric:
 
@@ -524,8 +582,6 @@ class MCMetrics:
     
         return cis
     
-
-
 
     """ Class Caluations """
 

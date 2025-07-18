@@ -8,12 +8,11 @@
 
 Figure: Example of a screening curve.
 
-Monte Carlo Metrics (MCMetrics) is an easy to use Python library that leverages Bayesian inference to calculate confusion matrix metrics with respect to sample size. MCMetrics is designed to be a simple, yet powerful tool for data scientists, statisticians, and machine learning engineers to calculate metrics like accuracy, recall, precision, and F1 score with credible intervals, and to perform hypothesis testing and model selection. 
-
 ## **Table of Contents**
 
 <!--ts-->
 * [Overview](#overview)
+* [Notes and Future Additions](#notes-and-future-additions)
 * [Installation](#installation)
 * [Quick Start](#quick-start)
 * [Methods and Workflow](#methods-and-workflow)
@@ -23,16 +22,19 @@ Monte Carlo Metrics (MCMetrics) is an easy to use Python library that leverages 
 
 ## **Overview**
 
-Monte Carlo Metrics (MCMetrics) offers various functions to calculate confusion matrix methods with respect to sample size. The major advantage of MCMetrics is it reports credible intervals (CIs) for each metric.
+Monte Carlo Metrics (MCMetrics) is an easy to use Python library that leverages Bayesian inference to calculate conditional performance metric uncertainty with respect to sample size. MCMetrics differs from other conditional performance metric libraries by providing credible intervals (CIs) for each metric, which are implicitly calculated from the posterior distribution of the metric. This allows users to understand the uncertainty in their metric estimates, which is particularly useful in fields like medical diagnostics, machine learning, and any domain where performance metrics are critical. Additionally, MCMetrics is built on top of NumPy and Scikit-Learn, making it easy to integrate into existing workflows.
 
-MCMetrics calculates CIs by sampling a posterior Dirichlet distribution with a default or specified prior distribution combined with the data. MCMetrics then calculates statistics like accuracy, recall (i.e., sensitivity), positive predictive value (i.e., precision), among others from the samples (see the [List of Metrics] section).
+MCMetrics calculates CIs by sampling a posterior Dirichlet distribution with a default or specified prior distribution combined with the data. MCMetrics then calculates statistics like accuracy, recall (i.e., sensitivity), positive predictive value (i.e., precision), among others from the samples (see the [List of Metrics](#list-of-metrics) section).
 
-MCMetrics takes a relatively straight forward approach when calculating metric statistics and CIs. First, it samples the upated posterior distribution and generates $n$ total samples. Second, it calculates the metric for each sample. Then third, it summarizes the metrics distribution. Additionally, once a metric is calculated, it is permanently stored and only removed 
-if another $n$ samples are called and the ```update``` parameter set to ```False```.
+MCMetrics takes a relatively straight forward approach when calculating conditional performance metrics and CIs. First, it samples $n$ times from the posterior Dirichlet distribution comprised of the prior and confusion matrix. After samples are generated, the user can specify which conditional performance metrics to calculate. Then, each metric can be summarized by its posterior distribution in the form of summary statistics and CIs. Once a metric is calculated, it is permanently stored and only removed if another $n$ samples are called and the ```resample``` parameter set to ```True```.
 
-Documentation:
-Examples:
-Bug Reports: 
+MCMetrics works by automating calling several independent functions in a workflow. As such, MCMetrics functions can be called independently and function similar to the Scikit-Learn metric functions by specifying either a confusion matrix or the raw parameter values (i.e., TPs, FPs, FNs, and FPs, or the predicted y and actual y values). 
+
+## **Notes and Future Additions**
+
+Note 1: Currently, MCMetrics only fully supports binary classification confusion matrices. It is possible to calculate metrics for multiclass confusion matrices, but the statistics and CIs are equivalent to micro-averaging since each sample from the posterior is weighted equally. Future versions will support macro-averaging and specifying weights. 
+
+Note 2: MCMetrics is currently in active development and all features are not fully implemented. Some of the API may change in future versions, but the core functionality and workflow specified in the [Quick Start](#quick-start) will remain the same.
 
 ## **Installation**
 
@@ -60,7 +62,7 @@ cm1 = np.array([[100,10],
 mc = MCMetrics(model_name="model_1", cm=cm1) # prior is set to 1 by default
 
 # sample posterior
-mc.sample(n=1000) # default n = 100_000
+mc.sample(n=1_000) # default n = 100_000
 
 # calculate and return metric and credible intervals
 
@@ -76,18 +78,28 @@ test1.calculate_metric(metric=metrics, averaging=None)
 # {'class_0': {'mu': 0.72, 'cil': 0.56, 'ciu': 0.95},
 #  'class_1': {'mu': 0.72, 'cil': 0.56, 'ciu': 0.95},
 
+# calculate summary statistics
+mc1.calc_mean(metric='sensitivity') # mean
+mc1.calc_std(metric='sensitivity') # standard deviation
+mc1.calc_median(metric='sensitivity') # median
+mc1.calc_mode(metric='sensitivity') # mode
+mc1.calc_var(metric='sensitivity', ddof=0) # population variance
+
+# chain together calculations
+mc1.calculate_metric(metric='specificity').calc_mean()
+
+# calculate credible intervals
+mc1.calculate_ci(metric='sensitivity', ci=0.95)
+
+# the upper and lower bounds of the credible interval can be explicited specified
+mc1.calculate_ci(metric='sensitivity', cil=0.005, ciu=0.99)
+
+# Remember, the credible intervals are a property of the posterior distribution 
+# for a  metric, along with the mean, median, and mode. All of these statistics 
+# describe the conditional performance metric uncertainty with respect to 
+# sample size.
+
 ```
-
-
-## **Methods and Workflow**
-
-MCMetrics works by automating calling several independent functions in a workflow. As such, MCMetrics 
-functions can be called independently and function similar to Scikit-Learn Metrics functions by specifying 
-either a confusion matrix or the raw parameter values (i.e., TPs, FPs, FNs, and FPs, or the predicted y and actual y values). A brief example of this workflow and where each function for the [Quick Start](#quick-start) is called is showm below in figure 1:
-
-Once posterior samples are generated, they are stored in a numpy array and used for all subsequent metric
-calculations. Additional posterior samples can be added by calling the `sample` method again. Functions 
-can also be chained together by specifying 
 
 ## **List of Metrics**
 
