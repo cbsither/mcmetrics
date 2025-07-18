@@ -106,165 +106,36 @@ mc.calculate_ci(metric='sensitivity', cil=0.005, ciu=0.99)
 A full list of metrics is included below. Each metric is called based by the exact command below in the `metric` parameter. For instance, to call precision, you would call `metric='precision'`. Or for a metric with spaces, you would call `metric='positive predictive value'`.
 
 * `prevalence`
-
-Prevalence is the proportion of positives in a population. These could be the number of people with a disease, the number of people who like a product, etc.
-
-$$
-\text{Prevalence} = \frac{TP + FN}{TP + FP + TN + FN}
-$$
-
 * `accuracy`
-
-Accuracy is the proportion of true results (both true positives and true negatives) among the total number of cases examined.
-
-$$
-\text{Accuracy} = \frac{TP + TN}{TP + FP + TN + FN}
-$$
-
 * `balanced accuracy`
-
-$$
-\text{Balanced Accuracy} = \frac{1}{2} \left( \frac{TP}{TP + FN} + \frac{TN}{TN + FP} \right)
-$$
-
 * `precision`
-
-$$
-\text{Precision} = \frac{TP}{TP + FP}
-$$
-
 * `positive predictive value`
-
 Same as `precision`.
-
 * `false discovery rate`
-
-$$
-\text{False Discovery Rate} = \frac{FP}{FP + TP}
-$$
-
 * `f1 score`
-
-$$
-\text{F1 Score} = \frac{2 TP}{2 TP + FP + FN}
-$$
-
 * `false omission rate`
-
-$$
-\text{False Omission Rate} = \frac{FN}{FN + TN}
-$$
-
 * `negative predictive value`
-
-$$
-\text{Negative Predictive Value} = \frac{TN}{TN + FN}
-$$
-
 * `fowlkes-mallows index`
-
-$$
-\text{Fowlkes-Mallows Index} = \frac{TP}{\sqrt{(TP + FP)(TP + FN)}}
-$$
-
 * `informedness`
-
-$$
-\text{Informedness} = \frac{TP}{TP + FN} + \frac{TN}{TN + FP} - 1
-$$
-
 * `sensitivity`
-
-$$
-\text{Sensitivity} = \frac{TP}{TP + FN}
-$$
-
 * `true positive rate`
-
 Same as `sensitivity`.
-
 * `recall`
-
 Same as `sensitivity`.
-
 * `false positive rate`
-
-$$
-\text{False Positive Rate} = \frac{FP}{FP + TN}
-$$
-
 * `positive likelihood ratio`
-
-$$
-\text{Positive Likelihood Ratio} = \frac{\text{Sensitivity}}{1 - \text{Specificity}} = \frac{TP \times (FP + TN)}{FP \times (TP + FN)}
-$$
-
 * `markedness`
-
-$$
-\text{Markedness} = \frac{TP}{TP + FP} + \frac{TN}{TN + FN} - 1
-$$
-
 * `true negative rate`
-
-$$
-\text{True Negative Rate} = \frac{TN}{TN + FP}
-$$
-
 * `matthews correlation coefficient`
-
-$$
-\text{Matthews Correlation Coefficient} = \frac{TP \times TN - FP \times FN}{\sqrt{(TP + FP)(TP + FN)(TN + FP)(TN + FN)}}
-$$
-
 * `prevalence threshold`
-
-
-$$
-\text{Prevalence Threshold} = \frac{\sqrt{\text{Sensitivity} \times (1 - \text{Specificity})} \+\ \text{Specificity} \-\ 1}
-{\text{Sensitivity} + \text{Specificity} - 1} \=\ \frac{\sqrt{\frac{TP}{TP + FN}\\bigl(1 - \frac{TN}{TN + FP}\bigr)} \+\ \frac{TN}{TN + FP} \-\ 1}
-{\Bigl(\frac{TP}{TP + FN} + \frac{TN}{TN + FP}\Bigr) - 1}
-$$
-
-
 * `false negative rate`
-
-$$
-\text{False Negative Rate} = \frac{FN}{FN + TP}
-$$
-
 * `specificity`
-
 Same as `true negative rate`.
-
 * `negative likelihood ratio`
-
-$$
-\text{Negative Likelihood Ratio} = \frac{1 - \text{Sensitivity}}{\text{Specificity}} = \frac{FN \times (TN + FP)}{TN \times (TP + FN)}
-$$
-
 * `diagnostic odds ratio`
-
-$$
-\text{Diagnostic Odds Ratio} = \frac{\text{Positive Likelihood Ratio}}{\text{Negative Likelihood Ratio}} = \frac{TP \times TN}{FP \times FN}
-$$
-
 * `jaccard index`
-
-$$
-\text{Jaccard Index} = \frac{TP}{TP + FP + FN}
-$$
-
 * `critical success index`
-
 Same as `Jaccard Index`.
-
 * `threat score`
-
 Same as `Jaccard Index`.
-
 * `screening coefficient`
-
-$$
-\text{Screening Coefficient} = \text{Sensitivity} + \text{Specificity} = \frac{TP}{TP + FN} + \frac{TN}{TN + FP}
-$$
