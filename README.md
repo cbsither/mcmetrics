@@ -15,8 +15,6 @@ Figure: Example of a screening curve.
 * [Notes and Future Additions](#notes-and-future-additions)
 * [Installation](#installation)
 * [Quick Start](#quick-start)
-* [Methods and Workflow](#methods-and-workflow)
-* [Calculate Metrics](#calculate-metrics)
 * [List of Metrics](#list-of-metrics)
 <!--te-->
 
@@ -51,7 +49,7 @@ pip install mcmetrics
 import numpy as np
 import mcmetrics
 
-# Create a 3x3 confusion matrix. By default 
+# Create a 2x2 confusion matrix. By default 
 # mcmetrics interpets the 'actual' condition 
 # as rows and 'predicted' condition as columns.
 
@@ -74,9 +72,6 @@ mc.calculate_metric(metric='specificity', averaging=None)
 # loop calculations
 metrics = ['accuracy', 'positive predictive value', 'prevalence threshold']
 mc.calculate_metric(metric=metrics, averaging=None)
-
-# {'class_0': {'mu': 0.72, 'cil': 0.56, 'ciu': 0.95},
-#  'class_1': {'mu': 0.72, 'cil': 0.56, 'ciu': 0.95},
 
 # calculate summary statistics
 mc.calc_mean(metric='sensitivity') # mean
