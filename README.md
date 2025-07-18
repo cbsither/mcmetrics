@@ -67,32 +67,32 @@ mc.sample(n=1_000) # default n = 100_000
 # calculate and return metric and credible intervals
 
 # calculate sensitivity
-test1.calculate_metric(metric='sensitivity', averaging=None)
+mc.calculate_metric(metric='sensitivity', averaging=None)
 # calculate specificity
-test1.calculate_metric(metric='specificity', averaging=None)
+mc.calculate_metric(metric='specificity', averaging=None)
 
 # loop calculations
 metrics = ['accuracy', 'positive predictive value', 'prevalence threshold']
-test1.calculate_metric(metric=metrics, averaging=None)
+mc.calculate_metric(metric=metrics, averaging=None)
 
 # {'class_0': {'mu': 0.72, 'cil': 0.56, 'ciu': 0.95},
 #  'class_1': {'mu': 0.72, 'cil': 0.56, 'ciu': 0.95},
 
 # calculate summary statistics
-mc1.calc_mean(metric='sensitivity') # mean
-mc1.calc_std(metric='sensitivity') # standard deviation
-mc1.calc_median(metric='sensitivity') # median
-mc1.calc_mode(metric='sensitivity') # mode
-mc1.calc_var(metric='sensitivity', ddof=0) # population variance
+mc.calc_mean(metric='sensitivity') # mean
+mc.calc_std(metric='sensitivity') # standard deviation
+mc.calc_median(metric='sensitivity') # median
+mc.calc_mode(metric='sensitivity') # mode
+mc.calc_var(metric='sensitivity', ddof=0) # population variance
 
 # chain together calculations
-mc1.calculate_metric(metric='specificity').calc_mean()
+mc.calculate_metric(metric='specificity').calc_mean()
 
 # calculate credible intervals
-mc1.calculate_ci(metric='sensitivity', ci=0.95)
+mc.calculate_ci(metric='sensitivity', ci=0.95)
 
 # the upper and lower bounds of the credible interval can be explicited specified
-mc1.calculate_ci(metric='sensitivity', cil=0.005, ciu=0.99)
+mc.calculate_ci(metric='sensitivity', cil=0.005, ciu=0.99)
 
 # Remember, the credible intervals are a property of the posterior distribution 
 # for a  metric, along with the mean, median, and mode. All of these statistics 
