@@ -10,6 +10,8 @@ Figure: Example of a screening curve.
 
 ## **Table of Contents**
 
+Github Repository: [mcmetrics](https://github.com/cbsither/mcmetrics)
+
 <!--ts-->
 * [Overview](#overview)
 * [Notes and Future Additions](#notes-and-future-additions)
