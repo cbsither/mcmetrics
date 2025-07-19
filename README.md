@@ -22,13 +22,9 @@ Github Repository: https://github.com/cbsither/mcmetrics
 
 ## **Overview**
 
-Monte Carlo Metrics (MCMetrics) is an easy to use Python library that leverages Bayesian inference to calculate conditional performance metric uncertainty with respect to sample size. MCMetrics differs from other conditional performance metric libraries by providing credible intervals (CIs) for each metric, which are implicitly calculated from the posterior distribution of the metric. This allows users to understand the uncertainty in their metric estimates, which is particularly useful in fields like medical diagnostics, machine learning, and any domain where performance metrics are critical. Additionally, MCMetrics is built on top of NumPy and Scikit-Learn, making it easy to integrate into existing workflows.
+Monte Carlo Metrics (MCMetrics) is an easy to use Python library that leverages Bayesian inference to calculate conditional performance metric uncertainty with respect to sample size. MCMetrics differs from other conditional performance metric libraries by providing credible intervals (CIs) for each metric, which are implicitly calculated from the posterior distribution of the metric. This allows users to understand the uncertainty in their metric estimates, which is particularly useful in fields like medical diagnostics, machine learning, and any domain where performance metrics are critical. MCMetrics is built on top of the [NumPy](https://numpy.org/) library and incorporates elements of the [Scikit-Learn](https://scikit-learn.org/stable/) library. 
 
-MCMetrics calculates CIs by sampling a posterior Dirichlet distribution with a default or specified prior distribution combined with the data. MCMetrics then calculates statistics like accuracy, recall (i.e., sensitivity), positive predictive value (i.e., precision), among others from the samples (see the [List of Metrics](#list-of-metrics) section).
-
-MCMetrics takes a relatively straight forward approach when calculating conditional performance metrics and CIs. First, it samples $n$ times from the posterior Dirichlet distribution comprised of the prior and confusion matrix. After samples are generated, the user can specify which conditional performance metrics to calculate. Then, each metric can be summarized by its posterior distribution in the form of summary statistics and CIs. Once a metric is calculated, it is permanently stored and only removed if another $n$ samples are called and the ```resample``` parameter set to ```True```.
-
-MCMetrics works by automating calling several independent functions in a workflow. As such, MCMetrics functions can be called independently and function similar to the Scikit-Learn metric functions by specifying either a confusion matrix or the raw parameter values (i.e., TPs, FPs, FNs, and FPs, or the predicted y and actual y values). 
+MCMetrics calculates CIs by sampling a posterior Dirichlet distribution with a default or specified prior distribution. Conditional performance metrics (e.g., accuracy, recall, precision) are calculated using samples drawn from the posterior distrition. For a full list of performance metrics please see the [List of Metrics](#list-of-metrics) section.
 
 ## **Notes and Future Additions**
 
@@ -36,7 +32,7 @@ Note 1: Currently, MCMetrics only fully supports binary classification confusion
 
 Note 2: MCMetrics is currently in active development and all features are not fully implemented. Some of the API may change in future versions, but the core functionality and workflow specified in the [Quick Start](#quick-start) will remain the same.
 
-## **Installation**
+## **Installation and Dependencies**
 
 Stable
 ------
@@ -44,6 +40,10 @@ The ```pip``` version is the last stable release. Version: *0.1.1*
 ```sh
 pip install mcmetrics
 ```
+
+Dependencies
+
+
 
 ## **Quick Start**
 
@@ -60,6 +60,9 @@ cm1 = np.array([[100,10],
 
 # initiate the Metrics class
 mc = MCMetrics(model_name="model_1", cm=cm1) # prior is set to 1 by default
+
+# Alternatively you can specify the y-predict and y-true arrays directly
+# mc = MCMetrics(model_name="model_1", y_true=y_true, y_pred=y_pred)
 
 # sample posterior
 mc.sample(n=1_000) # default n = 100_000
