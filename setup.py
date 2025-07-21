@@ -8,7 +8,7 @@ setup(
     author='Charlie Sither',
     author_email='toxorhynchitini@gmail.com',
     url='https://github.com/cbsither/monte-carlo-metrics',
-    version='0.1.1',
+    version='0.2.1',
     maintainer='Charlie Sither',
     maintainer_email='toxorhynchitini@gmail.com',
     download_url="https://github.com/cbsither/monte-carlo-metrics.git",

@@ -36,7 +36,7 @@ Note 2: MCMetrics is currently in active development and all features are not fu
 
 Stable
 ------
-The ```pip``` version is the last stable release. Version: *0.1.1*
+The ```pip``` version is the last stable release. Version: *0.2.1*
 ```sh
 pip install mcmetrics
 ```
