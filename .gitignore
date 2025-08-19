@@ -1,0 +1,9 @@
+/scratch
+mcmetrics/_main_old.py
+/.venv
+/mcmetrics.egg-info
+/tests/__pycache__
+_Readme_Old.md
+/build
+/dist
+/mcmetrics/__pycache__
