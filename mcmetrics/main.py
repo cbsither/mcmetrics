@@ -2,13 +2,19 @@ import numpy as np
 import csv
 from sklearn.metrics import confusion_matrix
 import pickle
+import multiprocessing as mp
 
 
 class MCMetrics:
 
     def __init__(self, model_name, prior=1, cm=None, 
-                 y_true=None, y_pred=None, class_names=None):
+                 y_true=None, y_pred=None, class_names=None, threads=4):
     
+        if threads < mp.cpu_count():
+            self.threads = threads
+        else:
+            raise ValueError("Number of threads must be less than the number of available CPU cores.")
+
         if cm is not None:
             self.cm = np.array(cm).astype('float')
         elif y_true is not None and y_pred is not None:
@@ -178,6 +184,19 @@ class MCMetrics:
 
 
     """ Sampler and Helper Functions """
+
+    def division_of_labor(self, samples):
+        """
+        Determines the number of samples to be assigned to each thread.
+        """
+
+        min_samples = samples // self.threads
+        thread_spool = [min_samples] * self.threads
+
+        for i in range(0, samples % self.threads):
+            thread_spool[i] += 1
+
+        return thread_spool
 
     def retrieve_metrics_list(self):
         """

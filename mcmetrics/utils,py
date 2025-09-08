@@ -1,0 +1,16 @@
+
+
+class Exception(Exception):
+    """Base class for all exceptions in this module."""
+    pass
+
+class InvalidMetricError(Exception):
+    """Exception raised when an invalid metric is encountered."""
+    
+    def __init__(self, metric_name):
+        super().__init__(f"Invalid metric: {metric_name}")
+        self.metric_name = metric_name
+
+
+
+
