@@ -30,10 +30,10 @@ class Metrics:
         return cm.sum() - (self.TP(cm, j) + self.FP(cm, j) + self.FN(cm, j))
 
     def N_(self, cm, j):
-        return self.FN(cm, j) + self.TN(cm , j)
+        return self.FN(cm, j) + self.TN(cm, j)
     
     def P_(self, cm, j):
-        return self.TP(cm, j) + self.FP(cm , j) 
+        return self.TP(cm, j) + self.FP(cm, j) 
     
     def class_proportions(self):
         return self.cm.sum(axis=1) / self.cm.sum()
@@ -250,6 +250,7 @@ class Metrics:
         return (a_*c_) / ((a_*c_)+(b_*c_)-b_-c_+1)
 
     def binomial_me(self, z_, p_, me_):
+        # Wald sample size
         return (z_**2 * p_ * (1 - p_)) / (me_)**2
 
     def cohens_kappa(self, cm, j):

@@ -732,6 +732,14 @@ class MCMetrics:
         return self.TP(cm, j) / self.P_(cm, j)
 
     def spec(self, cm, j):
+        """
+        Specificity is the probability that a negative test result (or model prediction)
+        conditioned on the the true class being negative. It assesses the model's ability
+        to correctly identify negative cases.
+
+        Definition:
+            Specificity = TN / N
+        """
         return self.TN(cm, j) / self.N_(cm, j)
 
     def tpr(self, cm, j):
@@ -811,9 +819,26 @@ class MCMetrics:
         return self.sens(cm, j) + self.spec(cm, j)
 
     def ts(self, cm, j):
+        """
+        Threat Score (TS) is the ratio of the area where the model predicted correctly to 
+        the area where the model did not predict correctly.
+
+        More Info (forecasting):
+        https://www.e-education.psu.edu/files/meteo410/image/Lesson3/threat_score0202.html
+
+        Definition:
+            Threat Score = TP / (TP + FN + FP)
+        """
         return self.TP(cm, j) / (self.TP(cm, j) + self.FN(cm, j) + self.FP(cm, j))
     
     def jaccard_index(self, cm, j):
+        """
+        Jaccard Index (JI) is the area of overlap divided by the area of union. It's the
+        same as the Threat Score (TS) above.
+
+        Definition:
+            Jaccard Index = TP / (TP + FN + FP)
+        """
         return self.ts(cm, j)
 
     def csi(self, cm, j):
