@@ -15,7 +15,7 @@ class Plots:
     pass
 
 @dataclass
-class Metrics:
+class Metadata:
     summary_stats: dict = {'mean': 'calc_mean',
                            'mode': 'calc_mode',
                            'median': 'calc_median',
