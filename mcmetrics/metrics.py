@@ -5,6 +5,56 @@ class Metrics:
     Functions for all metrics.
     """
 
+    def fit_beta(self, metric):
+
+        """
+        Fits a Beta distribution to the posterior samples for a metric.
+        """
+        pass
+
+
+    def _micro(self, metric, cm, j):
+        """
+        Micro-averaging calculates a metric as of all samples are equally weighted.
+        This is equivalent to calculating the metric from the aggregated confusion matrix 
+        which is what implicitly occurs in the MCMetrics program.
+        """
+
+        return
+
+    def _macro(self, metric):
+        """
+        Macro-averaging weights each class equally regardless of its prevalence. Classes that are
+        overrepresented in the dataset will have less of an impact on the final metric value.
+
+        This is equivalent to calculating the metric for each class and then averaging the results.
+
+        MCMetrics handles macro-averaging slightly different, instead of treating each class equally,
+        as a scalar, it applies a log-normal distribution to each class given the class sample size.
+
+        For example:
+
+        Matrix = [[500, 10, 5],
+                  [5, 45, 5],
+                  [1, 5, 55]]
+
+        Class 1 has 515 samples, Class 2 has 55 samples, and Class 3 has 61 samples.
+
+        Class 1 weights would be 1/3 * lognormal(shape=1/sqrt(515), loc=0, scale=1)
+        Class 2 weights would be 1/3 * lognormal(shape=1/sqrt(55), loc=0, scale=1)
+        Class 3 weights would be 1/3 * lognormal(shape=1/sqrt(61), loc=0, scale=1)
+
+        This provides a balanced approach to macro-averaging that still accounts for class imbalances 
+        and uncertainty in sample sizes.
+        """
+
+
+        return 
+    
+    def _weighted(self):
+        return
+
+
     def TP(self, cm, j):
         """
         Returns the true positives for a given class j in a square matrix size m.
